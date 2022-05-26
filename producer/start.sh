@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run --network kafka producer:latest
+docker run -e TZ=Europe/Amsterdam --network kafka producer:latest

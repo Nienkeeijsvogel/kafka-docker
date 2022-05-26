@@ -42,4 +42,3 @@ for _ in range(500):
     data = details.encode_to_bytes()
     producer.send('mytopic', value=data)
     sleep(3)
-

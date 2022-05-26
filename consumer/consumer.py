@@ -1,15 +1,11 @@
 from kafka import KafkaConsumer
 from protobuf3.message import Message
 from protobuf3.fields import StringField, Int32Field, MessageField
-
+import datetime
 
 consumer = KafkaConsumer(
     'mytopic',
-     bootstrap_servers=['kafka-2:29092'],
-     auto_offset_reset='earliest',
-     enable_auto_commit=True,
-     group_id='mytopic_group')
-
+     bootstrap_servers=['kafka-1:19092'])
 
 """schema"""
 class Transaction(Message):
@@ -21,9 +17,6 @@ class Transaction(Message):
 
 class Details(Message):
     data = MessageField(field_number=1, repeated=True, message_cls=Transaction)
-
-
-
 details = Details()
 
 
@@ -31,16 +24,14 @@ details = Details()
 for message in consumer:
     message = message.value
     details.parse_from_bytes(message)
-
-    #aggregating the results
-    accountno_balance_map = {}
     for d in details.data:
-        if  d.account_number not in accountno_balance_map:
-            accountno_balance_map[d.account_number] = 0
-        accountno_balance_map[d.account_number] += d.amount
+        date_prod = (datetime.datetime.strptime(d.transaction_datetime,"%Y-%m-%dT%H:%M:%S.%f"))
+        print(date_prod)
+        datetime_cons = datetime.datetime.now()
+        print(datetime_cons)
+        #print(datetime_cons)
+        difference = datetime_cons - date_prod
+        elem = str(difference).split(':')[2]
+        print(elem)
 
-    # logging account_number and balance
-    print("------------------------------------------")
-    print("account number and balance")
-    print(list(accountno_balance_map.items()))
 
